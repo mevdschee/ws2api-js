@@ -65,12 +65,16 @@ class WebSocketHandler {
             return new Response('no upgrade requested', { status: 500 });
         }
         const client = Deno.createHttpClient({})
+        let fetchResponse: Response
         let responseString: string;
         try {
-            const fetchResponse: Response = await fetch(this.serverUrl+address,{client:client});             
+            fetchResponse = await fetch(this.serverUrl+address,{client:client});             
             responseString = await fetchResponse.text();
         } catch (_) {
-            return new Response('error when proxying connect', { status: 502 });
+            return new Response('error while proxying connect', { status: 502 });
+        }
+        if (fetchResponse.status!=200) {
+            console.log("error while proxying connect: "+fetchResponse.statusText);
         }
         if (responseString!= 'ok') {
             return new Response('not allowed to connect: ' + responseString, { status: 403 });
@@ -82,13 +86,17 @@ class WebSocketHandler {
             if (typeof event.data != "string") {
                 console.log("binary messages not supported");
             }
+            let fetchResponse: Response
             let responseString: string;
             try {
-                const fetchResponse: Response = await fetch(this.serverUrl+address,{client:client,method:"POST",body:event.data});
+                fetchResponse = await fetch(this.serverUrl+address,{client:client,method:"POST",body:event.data});
                 responseString = await fetchResponse.text();
             } catch (_) {
-                console.log("error when proxying message");
+                console.log("error while proxying message");
                 return
+            }
+            if (fetchResponse.status!=200) {
+                console.log("error while proxying message: "+fetchResponse.statusText);
             }
             if (responseString) {
                 try {
