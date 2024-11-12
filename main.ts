@@ -1,4 +1,5 @@
 import { parseArgs } from "jsr:@std/cli/parse-args";
+import { Mutex } from "https://deno.land/x/async@v2.1.0/mutex.ts";
 
 const flags = parseArgs(Deno.args, {
     string: ["listen","url"],
@@ -10,6 +11,19 @@ const listenHost: string = flags.listen.substring(0,flags.listen.indexOf(':'));
 const listenPort: number = parseInt(flags.listen.substring(flags.listen.indexOf(':')+1));
 
 console.log("Proxying to " + flags.url);
+
+interface WebSocketHandler {
+	mutex     :Mutex;
+	sockets   :{
+        [address: string]: WebSocketConnection;
+    };
+}
+
+interface WebSocketConnection {
+	readLock   :Mutex;
+	writeLock  :Mutex;
+	connection :WebSocket;
+}
 
 Deno.serve({
     hostname: listenHost,
