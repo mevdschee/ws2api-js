@@ -1,6 +1,7 @@
 # Websocket to API
 
-A Typescript implementation of the WS2API project.
+A Typescript implementation of the [WS2API](https://github.com/mevdschee/ws2api)
+project.
 
 ### Requirements
 
