@@ -1,4 +1,4 @@
-# Websocket to API
+# WS to API (in JS)
 
 A Typescript implementation of the [WS2API](https://github.com/mevdschee/ws2api)
 project.
