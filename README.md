@@ -15,4 +15,4 @@ Install Deno:
 
 Now run using:
 
-    deno main.ts
+    deno --allow-net main.ts
