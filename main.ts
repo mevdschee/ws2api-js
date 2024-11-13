@@ -1,4 +1,5 @@
 import { parseArgs } from "jsr:@std/cli/parse-args";
+import { Mutex } from "https://deno.land/x/async@v2.1.0/mutex.ts";
 
 // main
 function main() {
@@ -88,12 +89,16 @@ class WebSocketHandler {
             }
             let fetchResponse: Response
             let responseString: string;
+            const mu = new Mutex();
             try {
+                await mu.acquire();
                 fetchResponse = await fetch(this.serverUrl+address,{client:client,method:"POST",body:event.data});
                 responseString = await fetchResponse.text();
             } catch (_) {
                 console.log("error while proxying message");
                 return
+            } finally {
+                mu.release();
             }
             if (fetchResponse.status!=200) {
                 console.log("error while proxying message: "+fetchResponse.statusText);
